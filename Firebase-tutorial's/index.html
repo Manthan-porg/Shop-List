@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="favicon_io/site.webmanifest">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        html,
+        body {
+            background: #d2b48c;
+            color: #3e2723;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 25px 30px;
+            text-align: center;
+            width: 320px;
+            box-shadow: 0 4px 25px rgba(101, 67, 33, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(101, 67, 33, 0.3);
+        }
+
+        .cart-img {
+            width: 130px;
+            margin-bottom: 20px;
+            border-radius: 1rem;
+            border: 2px solid #a1887f;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #a1887f;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 15px;
+            text-align: center;
+            background-color: #f9f6f2;
+            color: #4e342e;
+            outline: none;
+            transition: 0.3s ease;
+        }
+
+        input::placeholder {
+            color: #9e7e6b;
+        }
+
+        input:focus {
+            background-color: #fff8f2;
+            border: 1px solid #8d6e63;
+            box-shadow: 0 0 8px rgba(141, 110, 99, 0.4);
+        }
+
+        .btn-primary {
+            background-color: #8b5e3c;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #6f4e37;
+            transform: scale(1.03);
+        }
+
+        ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            font-size: 15px;
+            background-color: #fff;
+            color: #4e342e;
+            padding: 10px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(101, 67, 33, 0.15);
+            flex-grow: 1;
+            text-align: center;
+            transition: all 0.2s ease;
+            min-width: 100px;
+            border: 1px solid #e0c7a1;
+        }
+
+        ul li:hover {
+            background-color: #f7e9d8;
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        ul h3 {
+            text-align: center;
+            color: #5d4037;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            input,
+            .btn-primary {
+                font-size: 14px;
+            }
+
+            ul li {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <img src="Images/cat-image.webp" alt="cart" class="cart-img" />
+
+        <input type="text" id="item-title" placeholder="Chocolate" />
+
+        <button id="add-btn" class="btn-primary" type="submit">Add to cart</button>
+
+        <ul id="shopping-list">
+
+        </ul>
+    </div>
+
+    <!-- Script Starts Here  -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAg_vz19-bAHEKWkiU81u1SoNZuXK9ZNjc",
+            authDomain: "fir-tutorial-a06c8.firebaseapp.com",
+            databaseURL: "https://fir-tutorial-a06c8-default-rtdb.firebaseio.com",
+            projectId: "fir-tutorial-a06c8",
+            storageBucket: "fir-tutorial-a06c8.firebasestorage.app",
+            messagingSenderId: "933865174217",
+            appId: "1:933865174217:web:ed5c7ce3c4f11b2e428918",
+            measurementId: "G-Q93LC6CNBG"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app)
+        const shoppingListDB = ref(database, "Shopping-List")
+
+        const inputField = document.getElementById("item-title")
+        const addBtn = document.getElementById("add-btn")
+        const shoppingList = document.getElementById("shopping-list")
+        addBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const inputText = inputField.value.trim();
+            push(shoppingListDB, inputText)
+
+            console.log(inputText)
+
+            clearInputField()
+        })
+
+        onValue(shoppingListDB, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val()
+                let dataArray = Object.entries(data)
+                clearShoppingList()
+                for (let dataArrayEl of dataArray) {
+                    let dataArrayElId = dataArrayEl[0]
+                    let dataArrayElValue = dataArrayEl[1]
+                    appendListEl(dataArrayEl)
+                }
+            }
+            else {
+                shoppingList.innerHTML = `<h3>No items here... yet</h3>`
+            }
+        })
+
+        function clearShoppingList() {
+            shoppingList.innerHTML = ""
+
+        }
+
+        function clearInputField() {
+            inputField.value = ""
+        }
+
+        function appendListEl(item) {
+            let itemId = item[0]
+            let itemVal = item[1]
+            let list = document.createElement("li")
+            list.textContent = itemVal
+            shoppingList.append(list)
+            list.addEventListener("dblclick", (e) => {
+                e.preventDefault()
+                console.log(itemId)
+                let exactLocationOfItemInDb = ref(database, `Shopping-List/${itemId}`)
+                remove(exactLocationOfItemInDb)
+            })
+        }
+
+    </script>
+</body>
+
+</html>
